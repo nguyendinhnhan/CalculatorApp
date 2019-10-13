@@ -29,6 +29,8 @@ const App = () => {
   const [display, setDisplay] = useState('0');
   const [orientation, setOrientation] = useState('portrait');
   const [operatorHighlight, setOperatorHighlight] = useState('');
+
+  // Implement action swipe on number to backscape
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: (evt, gestureState) => true,
     onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
@@ -49,6 +51,7 @@ const App = () => {
     setOrientation(width > height ? 'landscape' : 'portrait');
   });
 
+  // Handle event press of calc button
   const handleTap = (type, param) => {
     switch (type) {
       case BUTTON_TYPE.DIGIT:
