@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -31,25 +31,35 @@ const App = () => {
   const [operatorHighlight, setOperatorHighlight] = useState('');
 
   // Implement action swipe on number to backscape
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: (evt, gestureState) => true,
-    onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-    onMoveShouldSetPanResponder: (evt, gestureState) => true,
-    onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-    onPanResponderMove: (evt, gestureState) => {},
-    onPanResponderRelease: (evt, gestureState) => {
-      if (Math.abs(gestureState.dx) >= 50) {
-        handleTap(BUTTON_TYPE.BACKSPACE);
-      }
-    },
-  });
+  const [panResponder, setPanResponder] = useState(() =>
+    PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onPanResponderMove: (evt, gestureState) => {},
+      onPanResponderRelease: (evt, gestureState) => {
+        if (Math.abs(gestureState.dx) >= 50) {
+          handleTap(BUTTON_TYPE.BACKSPACE);
+        }
+      },
+    }),
+  );
 
-  // Listen for orientation changes...
-  Dimensions.addEventListener('change', () => {
-    const {width, height} = Dimensions.get('window');
-    orientationStyle = getStyleForOrientation(PADDING_KEYBOARD * 2);
-    setOrientation(width > height ? 'landscape' : 'portrait');
-  });
+  useEffect(() => {
+    const handlerChangeDimensions = () => {
+      const {width, height} = Dimensions.get('window');
+      orientationStyle = getStyleForOrientation(PADDING_KEYBOARD * 2);
+      setOrientation(width > height ? 'landscape' : 'portrait');
+    };
+
+    // Listen for orientation changes...
+    Dimensions.addEventListener('change', handlerChangeDimensions);
+
+    // clean up
+    return () =>
+      Dimensions.removeEventListener('change', handlerChangeDimensions);
+  }, []);
 
   // Handle event press of calc button
   const handleTap = (type, param) => {
